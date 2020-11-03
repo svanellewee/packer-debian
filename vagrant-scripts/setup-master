@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+if [[ "$HOSTNAME" =~ controller*  ]]
+then
+	kubeadm init --apiserver-advertise-address=192.168.2.20 --pod-network-cidr=123.123.0.0/16
+fi
+
+sudo yum install -y bash-completion vim
+mkdir -p $HOME/.kube
+cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+chown $(id -u):$(id -g) $HOME/.kube/config
+

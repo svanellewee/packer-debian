@@ -1,0 +1,44 @@
+{  
+  "variables": {
+      "ovf_path": "" 
+  },
+  "builders": [
+    {
+      "type": "virtualbox-ovf",
+      "vm_name": "virtualbox-example-ovf",
+
+      "shutdown_command": "echo 'vagrant' | sudo -S shutdown -P now",
+      "source_path": "{{ user `ovf_path` }}",
+
+      "ssh_password": "vagrant",
+      "ssh_port": 22,
+      "ssh_username": "vagrant"
+    }
+  ],
+  "provisioners": [
+    {
+      "inline": ["echo secondary provisioning"],
+      "type": "shell"
+    },
+    {
+	    "type": "shell",
+	    "execute_command": "echo vagrant | {{ .Vars }} sudo -E -S bash '{{ .Path }}'",
+	    "script": "stage2-scripts/setup-docker"
+    },
+    {
+	    "type": "shell",
+	    "execute_command": "echo vagrant | {{ .Vars }} sudo -E -S bash '{{ .Path }}'",
+	    "script": "stage2-scripts/setup-k8s"
+    }
+  ],
+  "post-processors": [
+          {
+            "type": "vagrant",
+            "output": "output/packer_debian_kubernetes.box"
+        },
+        {
+            "type": "manifest",
+            "output": "output/stage-2-manifest.json"
+        }
+  ]
+}

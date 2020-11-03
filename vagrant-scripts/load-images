@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+#mount -t vboxsf var_vm-shared /vagrant/
+[[ ! -d "/home/vagrant/shared/cache" ]] && exit 0;
+for i in $(find /home/vagrant/shared/cache/ -iname k8s*.tar)
+do 
+   docker load -i ${i}
+done

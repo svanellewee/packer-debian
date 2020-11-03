@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+yum -y install wget bash-completion telnet
+RELEASE="3.4.13"
+wget https://github.com/etcd-io/etcd/releases/download/v${RELEASE}/etcd-v${RELEASE}-linux-amd64.tar.gz
+tar xvzvf etcd-v${RELEASE}-linux-amd64.tar.gz
+cd etcd-v${RELEASE}-linux-amd64/
+cp etcdctl /usr/local/bin/

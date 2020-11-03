@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+#mount -t vboxsf var_vm-shared /vagrant/
+mkdir -p /home/vagrant/shared/cache
+#kubeadm config images pull
+docker images --format '{{.ID}} {{.Repository}}' | {
+	while read b a 
+	do 
+		echo "$b..${a##*/}.tar"
+		docker save ${a} -o /home/vagrant/shared/cache/k8s-${a##*/}.tar
+	done
+}

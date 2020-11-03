@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+sudo yum -y install haproxy 
+cat <<EOF | sudo tee /etc/haproxy/haproxy.cfg
+defaults
+  timeout client 30s
+  timeout server 30s
+  timeout connect 30s
+
+frontend control-plane
+   mode tcp
+   bind 192.168.2.10:6443
+   default_backend cluster-nodes
+
+
+backend cluster-nodes
+   mode tcp
+   balance roundrobin
+   server node0 192.168.2.20:6443 check
+   server node1 192.168.2.21:6443 check
+   server node2 192.168.2.22:6443 check
+EOF
+sudo systemctl restart haproxy
+
+# Because CentOS 8 likes to block everything by default
+sudo firewall-cmd --permanent --zone=public --add-service=http
+sudo firewall-cmd --permanent --zone=public --add-port=6443/tcp
+sudo firewall-cmd --reload

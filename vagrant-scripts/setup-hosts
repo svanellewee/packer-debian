@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+cat <<EOF | tee /etc/hosts
+192.168.2.10	loadbalancer
+192.168.2.20	controller-0
+192.168.2.21	controller-1
+192.168.2.22	controller-2
+192.168.2.30	worker-0
+192.168.2.31	worker-1
+192.168.2.32	worker-2
+EOF
