@@ -23,12 +23,22 @@
     {
 	    "type": "shell",
 	    "execute_command": "echo vagrant | {{ .Vars }} sudo -E -S bash '{{ .Path }}'",
+	    "script": "stage1-scripts/update-guest"
+    },
+    {
+	    "type": "shell",
+	    "execute_command": "echo vagrant | {{ .Vars }} sudo -E -S bash '{{ .Path }}'",
 	    "script": "stage2-scripts/setup-docker"
     },
     {
 	    "type": "shell",
 	    "execute_command": "echo vagrant | {{ .Vars }} sudo -E -S bash '{{ .Path }}'",
 	    "script": "stage2-scripts/setup-k8s"
+    },
+    {
+         "type": "shell",
+         "execute_command": "echo vagrant | {{ .Vars }} sudo -E -S bash '{{ .Path }}'",
+         "script": "stage2-scripts/setup-vagrant"
     }
   ],
   "post-processors": [

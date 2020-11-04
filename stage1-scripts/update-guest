@@ -9,7 +9,8 @@ apt -y install curl
 #yum -y install bash-completion make gcc kernel-headers kernel-devel perl dkms bzip2 tar
 /usr/bin/install --directory --owner=vagrant --group=vagrant --mode=0700 /home/vagrant/.ssh
 #cp ./insecure_keys/id_vagrant.pub /home/vagrant/.ssh/authorized_keys
-/usr/bin/curl "http://${PACKER_HTTP_ADDR}/id_vagrant.pub" --output /home/vagrant/.ssh/authorized_keys
+echo "...${PACKER_HTTP_ADDR}...."
+/usr/bin/curl "http://${PACKER_HTTP_IP}/id_vagrant.pub" --output /home/vagrant/.ssh/authorized_keys
 /usr/bin/chown vagrant:vagrant /home/vagrant/.ssh/authorized_keys
 /usr/bin/chmod 0600 /home/vagrant/.ssh/authorized_keys
 

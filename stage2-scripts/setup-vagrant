@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+echo "Starting Provision"  
+echo "making isomount"
+if [[ 1 -eq 1 ]]
+then
+	cd /tmp
+	mkdir /tmp/isomount
+	mount -t iso9660 -o loop /home/vagrant/VBoxGuestAdditions.iso /tmp/isomount
+	echo "success = ${?}.."
+	# Install the drivers
+        /tmp/isomount/VBoxLinuxAdditions.run --nox11
+        
+        echo "success from running? ${?}.."
+
+        cat /var/log/vboxadd-setup.log
+        # Cleanup
+        umount isomount
+        rm -rf isomount /root/VBoxGuestAdditions.iso
+        modprobe vboxguest
+
+        echo "unmounting ${?}"
+fi
+
+#mkdir -p /vagrant
+#chown vagrant:vagrant /vagrant

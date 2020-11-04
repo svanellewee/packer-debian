@@ -26,9 +26,9 @@
 		    "<wait><down>",
 		    "<tab><wait>url=http://{{ .HTTPIP }}:{{ .HTTPPort }}/preseed.cfg<enter>",
 		    "<wait10m><enter>",
-		    "<wait2m>root<enter><wait>vagrant<enter><wait><wait><wait>",
+                    "<wait2m>root<enter><wait>vagrant<enter><wait><wait><wait>",
                     "wget http://{{ .HTTPIP }}:{{ .HTTPPort }}/update-guest<enter><wait><wait><wait>",
-		    "bash ./update-guest<enter><wait2m>"
+                    "bash ./update-guest {{ .HTTPIP }}:{{ .HTTPPort }}<enter><wait2m>"
             ],
             "cpus": 1,
             "memory": 2048,
@@ -42,6 +42,11 @@
         }
     ],
     "provisioners": [
+       {
+	 "type": "shell",
+	 "execute_command": "echo vagrant | {{ .Vars }} sudo -E -S bash '{{ .Path }}'",
+         "script": "stage1-scripts/setup-vagrant"
+       }
     ],
     "post-processors": [
         {

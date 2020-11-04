@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-echo "Starting Provision"  
+HTTP_ADDR="${1}"
+echo "Starting Provision ${HTTP_ADDR}"  
 #/usr/bin/curl "https://download.virtualbox.org/virtualbox/6.1.10/VBoxGuestAdditions_6.1.10.iso" --output /home/vagrant/guestadditions.iso
 #mkdir -p /media/guest
 # https://www.tecmint.com/install-virtualbox-guest-additions-in-centos-rhel-fedora/
@@ -9,7 +10,7 @@ apt -y install curl sudo
 #yum -y install bash-completion make gcc kernel-headers kernel-devel perl dkms bzip2 tar
 /usr/bin/install --directory --owner=vagrant --group=vagrant --mode=0700 /home/vagrant/.ssh
 #cp ./insecure_keys/id_vagrant.pub /home/vagrant/.ssh/authorized_keys
-/usr/bin/curl "http://${PACKER_HTTP_ADDR}/id_vagrant.pub" --output /home/vagrant/.ssh/authorized_keys
+/usr/bin/curl "http://${HTTP_ADDR}/id_vagrant.pub" --output /home/vagrant/.ssh/authorized_keys
 /usr/bin/chown vagrant:vagrant /home/vagrant/.ssh/authorized_keys
 /usr/bin/chmod 0600 /home/vagrant/.ssh/authorized_keys
 
@@ -18,4 +19,4 @@ echo 'vagrant ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers.d/10_vagrant
 /usr/bin/chmod 0440 /etc/sudoers.d/10_vagrant
 
 echo "finally ${?} rebooting."
-reboot
+#reboot

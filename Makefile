@@ -18,12 +18,12 @@ stage1: $(STAGE1_MANIFEST)
 .PHONY: stage2
 stage2: stage1
 	$(eval OVF := $(shell cat $(STAGE1_MANIFEST) | jq '.builds[0].files[].name' -r | grep -Po '[a-z0-9\-/]+.ovf'))
-	PACKER_LOG=1 packer build -var "ovf_path=$(OVF)"  stage2-template.json
+	PACKER_LOG=1 packer build --force -var "ovf_path=$(OVF)"  stage2-template.json
 
 .PHONY: import
 import: $(BOX)
-	vagrant box remove -f centos-kubernetes || true
-	vagrant box add $(BOX) --name centos-kubernetes
+	vagrant box remove -f debian-kubernetes || true
+	vagrant box add $(BOX) --name debian-kubernetes
 
 .PHONY: clean
 clean:

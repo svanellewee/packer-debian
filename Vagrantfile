@@ -23,8 +23,8 @@ worker_host_ips = {
 }
 
 Vagrant.configure("2") do |main|
-  main.vm.box = "centos-kubernetes"
-  main.ssh.private_key_path = "./insecure_keys/id_vagrant"
+  main.vm.box = "debian-kubernetes"
+  main.ssh.private_key_path = "./http-serve/id_vagrant"
   main.vm.synced_folder ".", "/home/vagrant/shared"
   main.vm.box_check_update = false
 
@@ -52,7 +52,7 @@ Vagrant.configure("2") do |main|
      end
      controller.vm.provision "shell", path: "./vagrant-scripts/setup-hosts"
      controller.vm.provision "shell", path: "./vagrant-scripts/load-images"
-     controller.vm.provision "shell", path: "./vagrant-scripts/set-controller-firewalld"
+     #controller.vm.provision "shell", path: "./vagrant-scripts/set-controller-firewalld"
      controller.vm.provision "shell", path: "./vagrant-scripts/odds-and-ends"
   end
  end
@@ -67,7 +67,7 @@ worker_host_ips.each do |name, ip|
      end
      worker.vm.provision "shell", path: "./vagrant-scripts/setup-hosts"
      worker.vm.provision "shell", path: "./vagrant-scripts/load-images"
-     worker.vm.provision "shell", path: "./vagrant-scripts/set-worker-firewalld"
+     #worker.vm.provision "shell", path: "./vagrant-scripts/set-worker-firewalld"
      worker.vm.provision "shell", path: "./vagrant-scripts/odds-and-ends"
   end
  end
