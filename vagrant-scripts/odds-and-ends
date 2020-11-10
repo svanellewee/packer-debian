@@ -1,8 +1,25 @@
 #!/usr/bin/env bash
 
-yum -y install wget bash-completion telnet
+sed -i '/swap/d' /etc/fstab
+swapoff -a
+apt -y install wget telnet vim tree htop
+cat <<"EOF" | tee /etc/docker/daemon.json
+{
+  "exec-opts": ["native.cgroupdriver=systemd"],
+  "log-driver": "json-file",
+  "log-opts": {
+    "max-size": "100m"
+  },
+  "storage-driver": "overlay2"
+}
+EOF
+systemctl restart docker
+
 RELEASE="3.4.13"
-wget https://github.com/etcd-io/etcd/releases/download/v${RELEASE}/etcd-v${RELEASE}-linux-amd64.tar.gz
-tar xvzvf etcd-v${RELEASE}-linux-amd64.tar.gz
-cd etcd-v${RELEASE}-linux-amd64/
-cp etcdctl /usr/local/bin/
+if [[ ! -f "/usr/local/bin/etcdctl" ]]
+then
+	wget https://github.com/etcd-io/etcd/releases/download/v${RELEASE}/etcd-v${RELEASE}-linux-amd64.tar.gz
+	tar xvzvf etcd-v${RELEASE}-linux-amd64.tar.gz
+	cd etcd-v${RELEASE}-linux-amd64/
+	cp etcdctl /usr/local/bin/
+fi

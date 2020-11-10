@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-sudo yum -y install haproxy 
+sudo apt -y install haproxy 
 cat <<EOF | sudo tee /etc/haproxy/haproxy.cfg
 defaults
   timeout client 30s
@@ -22,6 +22,6 @@ EOF
 sudo systemctl restart haproxy
 
 # Because CentOS 8 likes to block everything by default
-sudo firewall-cmd --permanent --zone=public --add-service=http
-sudo firewall-cmd --permanent --zone=public --add-port=6443/tcp
-sudo firewall-cmd --reload
+#sudo firewall-cmd --permanent --zone=public --add-service=http
+#sudo firewall-cmd --permanent --zone=public --add-port=6443/tcp
+#sudo firewall-cmd --reload

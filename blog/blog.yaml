@@ -1,0 +1,106 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: blog
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: blog-content
+  namespace: blog
+data:
+   mime_type: |-
+     types {
+             text/html                             html htm shtml;
+             text/css                              css;
+     }
+   index_html: |-
+     <!DOCTYPE html><html><head><title>Docker Static Example</title><link href="css/style.css" type="text/css" rel="stylesheet" /></head><body><h1>Welcome to next generation tech</h1></body></html>
+   css: |-
+     h1 {
+          color: RED;
+     }
+   config_data: |-
+     worker_processes 1;
+     events { worker_connections 1024; }
+     http {
+             #include    mime.types;
+             sendfile on;
+             server {
+                 root /usr/share/nginx/html/;
+                 index index.html;
+                 server_name localhost;
+                 listen 90;
+             }
+     }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: blog
+  namespace: blog
+  name: blog
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: blog
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: blog
+    spec:
+      volumes:
+      - name: blog-index
+        configMap:
+          name: blog-content
+          items:
+          - key: index_html
+            path: index.html
+      - name: blog-config
+        configMap:
+          name: blog-content
+          items:
+          - key: config_data
+            path: nginx.conf
+      - name: blog-mime
+        configMap:
+          name: blog-content
+          items:
+          - key: mime_type
+            path: mime.types
+      containers:
+      - image: nginx
+        name: nginx
+        volumeMounts:
+        - name: blog-index
+          mountPath: /usr/share/nginx/html/
+        - name: blog-config
+          mountPath: /etc/nginx/
+        - name: blog-mime
+          mountPath: /bla/
+        resources: {}
+status: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: blog
+  name: blog-service
+  namespace: blog
+spec:
+  ports:
+  - port: 90
+    protocol: TCP
+    targetPort: 90
+  selector:
+    app: blog
+  type: NodePort
+status:
+  loadBalancer: {}

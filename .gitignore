@@ -6,3 +6,4 @@ packer_cache
 insecure_keys/id_vagrant*
 *swp
 cache
+node_modules/
