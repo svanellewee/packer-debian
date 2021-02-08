@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+#apt upgrade && apt install -y linux-headers-$(uname -r) gcc make perl
+
 cat <<EOF | tee /etc/hosts
 192.168.2.10	loadbalancer
 192.168.2.20	controller-0

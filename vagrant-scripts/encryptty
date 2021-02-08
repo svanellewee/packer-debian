@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+
+function encrypt-config() {
+	local base64_encoded_secret="${1}"
+	cat <<- EOF 
+	apiVersion: apiserver.config.k8s.io/v1
+	kind: EncryptionConfiguration
+	resources:
+	  - resources:
+	    - secrets
+	    providers:
+	    - aescbc:
+	        keys:
+	        - name: key1
+	          secret: ${base64_encoded_secret}
+	    - identity: {}
+	EOF
+}
+
+secret="$(head -c 32 /dev/urandom | base64 -w 0)"
+
+encrypt-config "${secret}" > encryption-config.yml
+
+echo "${secret}" 

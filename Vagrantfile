@@ -23,6 +23,9 @@ worker_host_ips = {
 }
 
 Vagrant.configure("2") do |main|
+  if Vagrant.has_plugin? "vagrant-vbguest"
+   main.vbguest.auto_update = false
+  end
   main.vm.box = "debian-kubernetes"
   main.ssh.private_key_path = "./http-serve/id_vagrant"
   main.vm.synced_folder ".", "/home/vagrant/shared"

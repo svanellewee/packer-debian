@@ -1,0 +1,75 @@
+#!/usr/bin/env bash 
+
+function join() {
+	local some_array=($(echo "${1}"))
+	echo $(IFS=,; echo "${some_array[*]}")
+}
+
+function prefix() {
+	local v="${1}"
+	local some_array=($(echo "${2}"))
+	for elem in "${some_array[@]}"
+	do
+		echo "${v}${elem}" 
+	done
+}
+
+function _new-cert() {
+	local cert_prefix="${1:-ca}"
+	local common_name="${2:-example.com}"
+	local dns_sans_array=($(echo "${3}"))
+	echo "${dns_sans_array[3]}"
+	local ip_sans_array=($(echo "${4}"))
+	echo "${ip_sans_array[4]}"
+
+	local dnses=($(prefix "DNS:" "${dns_sans_array[*]}"))
+
+	local ipses=($(prefix "IP:" "${ip_sans_array[*]}"))
+
+	local san_array=($(join "${dnses[*]}") $(join "${ipses[*]}"))
+	local san_print=$(join "${san_array[*]}")
+	openssl req -x509 -newkey rsa:4096 -sha256 -days 3650 -nodes \
+		-keyout "${cert_prefix}-key.pem" -out "${cert_prefix}-cert.pem" \
+		-subj "/CN=${common_name}" -addext "subjectAltName=${san_print}"
+}
+
+function _new-secret() {
+	local cert_prefix="${1}"
+	local namespace="${2:-default}"
+	local secret_name="${3:-"${cert_prefix}-secret"}"
+	cat <<- EOF
+	apiVersion: v1
+	kind: Secret
+	metadata:
+	  name: ${secret_name}
+	  namespace: ${namespace}
+	data:
+	  tls.crt: $(cat "${cert_prefix}-cert.pem" | base64 -w 0)
+	  tls.key: $(cat "${cert_prefix}-key.pem" | base64 -w 0)
+	type: kubernetes.io/tls
+	EOF
+}
+
+
+function new-ca() {
+	local common_name="${1:-Cartman Authoritah}"
+	local prefix="${2:-ca}"
+	openssl req -x509 -sha256 -newkey rsa:4096 -keyout ${prefix}.key -out ${prefix}.crt -days 356 -nodes -subj "/CN=${common_name}"
+}
+
+
+function make-cert() {
+	local common_name="${1:-mydomain.com}"
+	local target_prefix="${2:-server}"
+	local ca_prefix="${3:-ca}"   # the signing CA cert.
+	openssl req -new -newkey rsa:4096 -keyout "${target_prefix}.key" -out "${target_prefix}.csr" -nodes -subj "/CN=${common_name}"
+	openssl x509 -req -sha256 -days 365 -in "${target_prefix}.csr" -CA "${ca_prefix}.crt" -CAkey "${ca_prefix}.key" -set_serial 01 -out "${target_prefix}.crt"
+}
+
+function new-secret() {
+	local target_prefix="${1}"
+	local ns="${2:-default}"
+	#kubectl -n "${ns}" create secret tls "tls-${target_prefix}-secret" --key "${target_prefix}.key" --cert "${target_prefix}.crt"
+	kubectl -n "${ns}" create secret generic "tls-${target_prefix}-secret" --from-file=tls.key="${target_prefix}.key" --from-file=tls.crt="${target_prefix}.crt"
+	kubectl -n "${ns}" create secret generic "tls-ca-secret" --from-file=ca.crt=ca.crt
+}
